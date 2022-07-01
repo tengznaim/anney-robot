@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="anney_pkg" type="order_publisher.py" name="order_publisher" output="screen"></node>
+	<node pkg="anney_pkg" type="order_subscriber.py" name="order_subscriber" output="screen"></node>
+</launch>
