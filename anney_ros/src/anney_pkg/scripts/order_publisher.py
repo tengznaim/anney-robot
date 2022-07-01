@@ -17,6 +17,9 @@ order_list = []
 unit_list = []
 
 def text2num(text):
+    ''' This method is standardize all numerical text into numbers. (eg. "satu nasi lemak --> 1 nasi lemak)
+        This method accept a string and return the standardize string. '''
+
     text = text.lower()
     num_dict = {"satu": "1", "one": "1","dua": "2", "two": "2","tiga": "3", "three": "3","empat": "4", "four": "4","lima": "5", "five": "5","enam": "6", "six": "6","tujuh": "7", "seven": "7","lapan": "8", "eight": "8","sembilan": "9", "nine": "9",}
     tokens = text.split(" ")
@@ -40,7 +43,7 @@ class MyListener(keyboard.Listener):
                              frames_per_buffer=CHUNK,
                              stream_callback = self.callback,
                              input_device_index=3)
-        self.start()
+        self.start() # Speech stream starts here, the stream can only be start once
         return self
     def __init__(self):
         super(MyListener, self).__init__(on_press=self.on_press, on_release=self.on_release)
@@ -65,13 +68,16 @@ class MyListener(keyboard.Listener):
     def callback(self,in_data, frame_count, time_info, status):
         callback_flag = pyaudio.paContinue
         if self.key_pressed:
+            # If user press and hold 'spacebar', it will append the frames data
             self.frames.append(in_data)
         if self.complete_tag:
+            # If user press esc button, it will stop the stream and start to create a wavfile of the order recording
             callback_flag = pyaudio.paComplete
-        # print(callback_flag)
         return in_data, callback_flag
 
     def __exit__(self, exc_type, exc_value, traceback):
+        ''' When the stream is stopped, this method will automatically be called to create the wavfile '''
+
         self.stream.stop_stream()
         self.stream.close()
         self.p.terminate()
@@ -83,25 +89,29 @@ class MyListener(keyboard.Listener):
         wf.writeframes(b''.join(self.frames))
         wf.close()
 
+        ''' Initialize speech recognition object and take the order recording as the audiofile to be recognized '''
         recognizer = sr.Recognizer()
-        recognizer.energy_threshold = 50 # higher than this consider speech, lower consider silent
+        recognizer.energy_threshold = 50 # Higher than this consider speech, lower consider silent
         audiofile = sr.AudioFile('output.wav')
 
+        ''' Start the recognition process '''
         with audiofile as source:
             recognizer.adjust_for_ambient_noise(source)
             audio = recognizer.record(source)
     
             try:
-                result = recognizer.recognize_google(audio_data=audio,language='ms-MY')
+                # Using google speech recognition
+                result = recognizer.recognize_google(audio_data=audio,language='ms-MY') #chose ms-MY for the Malay use case
                 result = text2num(result)
-                # using google speech recognition
                 print("Text: "+ result)
 
+                # The pattern that needs to be in the order to be recognized
                 pattern = r'[iI] want to order'
                 match = re.search(pattern,result)
                 if(match):
+                    # If there is a match, start to process the unit groups and the order(food) groups
+                    
                     matches = re.findall("(([0-9]+) ([A-Za-z\s]+))", result)
-
                     for match in matches:
                         unit_list.append(int(match[1]))
                         order_list.append(match[2].strip().replace(" ", "_"))
@@ -116,30 +126,35 @@ class MyListener(keyboard.Listener):
 
 
 def talk_to_me():
+    # Create a topic for publisher
     pub = rospy.Publisher("order_topic", Order, queue_size=10)
+
+    # Initialize publisher node
     rospy.init_node("publisher_node", anonymous=True)
     rospy.loginfo("Publisher Node Started")
 
     while not rospy.is_shutdown():
+        # Custom message which contains the table number, array of ordered food and an array of their corresponding quantities
         msg = Order()
-        
 
+        # Customer insert the table number
         table_num = int(input("Please enter your table number:"))
         with MyListener() as listener:
+            #anney robot start listening to take order
             print("You may order now..")
             listener.join()
-        # order = input("Enter your order:")
-        # matches = re.findall("(([0-9]+) ([A-Za-z\s]+))", order)
 
-        # for match in matches:
-        #     unit_list.append(int(match[1]))
-        #     order_list.append(match[2].strip().replace(" ", "_"))
-
+        # Store all information needed in custom message
         msg.table_num = table_num
         msg.orders = order_list
         msg.units = unit_list
 
+        # Publish the message
         pub.publish(msg)
+
+        # Clear the previous order and unit list
+        order_list = []
+        unit_list = []
 
 
 if __name__ == "__main__":
