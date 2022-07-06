@@ -1,0 +1,10 @@
+genpy==0.6.16
+numpy==1.13.3
+opencv_contrib_python==4.6.0.66
+Pillow==9.2.0
+PyAudio==0.2.11
+pynput==1.7.6
+SpeechRecognition==3.8.1
+scikit-build==0.15.0
+torch==1.10.1
+torchvision==0.11.2
