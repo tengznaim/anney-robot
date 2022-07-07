@@ -1,5 +1,7 @@
 # ANNEY Robot
 
+**NOTE:** This is an archive branch for ROS Noetic project that does not fully function. However, if using Python 3 modules and Ubuntu 20.04, this may be the better distribution to use.
+
 These scripts are for the model development and inferencing scripts used for a waiter robot named ANNEY built for the WID3005 Intelligent Robotics course.
 
 The scope of the robot are as follows:
