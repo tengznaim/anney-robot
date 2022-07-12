@@ -2,7 +2,7 @@
 
 This is a ROS project for a waiter robot named ANNEY built for the WID3005 Intelligent Robotics course.
 
-ANNEY Robot is a robot that works in a restaurant as a server. It takes orders by comprehending the customers' commands through speech recognition. It will submit the order received to the kitchen’s system. The robot would then use computer vision to verify the orders from the kitchen using object detection. The final idea that was unable to fulfilled would be to send the orders to the correct tables using robot movement and simultaneuos localization and mapping (SLAM).
+ANNEY Robot is a robot that works in a restaurant as a server. It takes orders by comprehending the customers' commands through speech recognition. It will submit the order received to the kitchen’s system. The robot would then use computer vision to verify the orders from the kitchen using object detection. The final idea that was unable to fulfilled would be to send the orders to the correct tables using robot movement and simultaneous localization and mapping (SLAM).
 
 The scope of the robot are as follows:
 
@@ -12,7 +12,7 @@ The scope of the robot are as follows:
 
 [Project Demo](https://drive.google.com/file/d/1YxdFAGxnfDageVoCzx2yCey40KT4FEWY/view?usp=sharing)
 
-### The Modules
+## The Modules
 
 There are two developed modules in this project:
 
@@ -27,7 +27,7 @@ There are two developed modules in this project:
    - This model was then used in conjunction with OpenCV to perform real-time inferencing.
    - An additional object tracking system was included to prevent duplicate detection of orders when operating in the robot.
 
-### The ROS Project
+## The ROS Project
 
 The ROS project, `anney_ros_melodic` contains a single package `anney_melodic_pkg`. This package contains two nodes: The **order_publisher** node and the **order_subscriber** node. The structure of the system and the modules included in the nodes are illustrated in the following diagram.
 
@@ -66,7 +66,7 @@ There is then a corresponding subscriber_node (**order_subscriber.py**) that sub
 
 The use of a topic allows for a natural queue where if multiple orders are submitted, the subscriber node would execute the object detection process sequentially. For example, if there are two orders, the detection for the first order would be executed until completion which will end the video capture. This process would then start again to detect and verify the second orders.
 
-### Running the Project
+## Running the Project
 
 **Note:** This project was built using **ROS Melodic** on Ubuntu 18.04. This distribution does not fully support the use of Python 3 modules but the use of the interpreter can be enforced using the shebang `#! /usr/bin/env python3` at the top of the node scripts. However, if there are issues, this was the guide was followed: https://www.dhanoopbhaskar.com/blog/2020-05-07-working-with-python-3-in-ros-kinetic-or-melodic/.
 
@@ -130,17 +130,17 @@ Otherwise, the project can be run using the following steps:
    capture = cv.VideoCapture(CHANGE_THIS)
    ```
 
-### Limitations
+## Limitations
 
 1. The speech recognition module could interpret quantities in string form or numeric form (eg. "satu" or 1). When the orders are interpreted in string form, there is a limitation in normalizing them into numbers. The current implementation only normalizes quantities from 1-9.
-2. The object detection module is highly sensitive to the performance of the model. Since the model is not fully tuned, it can missclassify the detected foods with many being classified as "satay" and "nasi_goreng".
+2. The object detection module is highly sensitive to the performance of the model. Since the model is not fully tuned, it can misclassify the detected foods with many being classified as "satay" and "nasi_goreng".
    - "mee_goreng" is also the worst performing class as the training dataset had the least number of images for this class and they were of low quality.
    - This also means that the fulfillment of the orders in the object module can be inaccurate as the model can detect an empty plate as "nasi goreng"
 3. Speech recognition also resulted in detected foods having different spelling compared to our defined class labels. (eg. **mi goreng** instead of **mee goreng** and **sate** instead of **satay**)
 4. The frame rate for object detection is lower due to object tracking rather than continuous detection and classification.
 5. There is no error handling for when the ordered food is not in the classes defined. For example, **"I want to order tiga kerusi"** is accidentally taken as a valid order.
 
-### Contributions
+### Contributors
 
 1. Muhammad Afiq Irfan bin Manor | [GitHub](https://github.com/Fiquee)
 2. Khairol Hazeeq bin Khairol Nizat | [GitHub](https://github.com/kerolzeeq)
